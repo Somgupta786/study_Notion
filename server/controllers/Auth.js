@@ -182,6 +182,8 @@ exports.login = async (req, res) => {
 exports.sendotp = async (req, res) => {
 	try {
 		const { email } = req.body;
+		
+		console.log(`🔄 Processing OTP request for email: ${email}`);
 
 		// Check if user is already present
 		// Find user with provided email
@@ -197,32 +199,68 @@ exports.sendotp = async (req, res) => {
 			});
 		}
 
+		// Generate unique OTP
 		var otp = otpGenerator.generate(6, {
 			upperCaseAlphabets: false,
 			lowerCaseAlphabets: false,
 			specialChars: false,
 		});
-		const result = await OTP.findOne({ otp: otp });
-		console.log("Result is Generate OTP Func");
-		console.log("OTP", otp);
-		console.log("Result", result);
-		while (result) {
+		
+		// Ensure OTP is unique (but limit retries to prevent infinite loop)
+		let retryCount = 0;
+		const maxRetries = 10;
+		let result = await OTP.findOne({ otp: otp });
+		
+		while (result && retryCount < maxRetries) {
 			otp = otpGenerator.generate(6, {
 				upperCaseAlphabets: false,
+				lowerCaseAlphabets: false,
+				specialChars: false,
+			});
+			result = await OTP.findOne({ otp: otp });
+			retryCount++;
+		}
+		
+		if (retryCount >= maxRetries) {
+			console.log("❌ Failed to generate unique OTP after maximum retries");
+			return res.status(500).json({ 
+				success: false, 
+				message: "Unable to generate OTP. Please try again." 
 			});
 		}
+
+		console.log(`✅ Generated unique OTP: ${otp} (attempts: ${retryCount + 1})`);
+
+		// Create OTP record (this will trigger email sending via pre-save hook)
 		const otpPayload = { email, otp };
+		const startTime = Date.now();
+		
 		const otpBody = await OTP.create(otpPayload);
-		console.log("OTP Body", otpBody);
+		
+		const endTime = Date.now();
+		const emailTime = endTime - startTime;
+		
+		console.log(`📧 OTP email process completed in ${emailTime}ms for ${email}`);
+		console.log("OTP Body created:", otpBody);
 
 		res.status(200).json({
 			success: true,
 			message: `OTP Sent Successfully`,
-			otp,
+			// Remove OTP from production response for security
+			...(process.env.NODE_ENV === 'development' && { otp }),
 		});
 	} catch (error) {
-		console.log(error.message);
-		return res.status(500).json({ success: false, error: error.message });
+		console.error(`❌ OTP sending error for email ${req.body?.email}:`, {
+			message: error.message,
+			stack: error.stack,
+			code: error.code
+		});
+		
+		return res.status(500).json({ 
+			success: false, 
+			message: "Failed to send OTP. Please try again later.",
+			...(process.env.NODE_ENV === 'development' && { error: error.message })
+		});
 	}
 };
 

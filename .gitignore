@@ -12,8 +12,8 @@ node_modules/
 /coverage
 *.lcov
 
-# Production builds
-/build
+# Production builds (uncomment /build if you want to commit the build)
+# /build
 /dist
 
 # Environment variables (NEVER commit these)
@@ -22,16 +22,12 @@ node_modules/
 .env.development.local
 .env.test.local
 .env.production.local
+.env.production
 server/.env
 **/.env
 
-# Database seeding scripts (contains sample data, not needed for production)
-server/seedData.js
-server/quickSeed.js
-server/extendedSeed.js
-server/addSampleCourses.js
-server/addEnrollments.js
-server/fixVideoUrls.js
+# Production configuration files
+server/.env.production
 
 # Logs
 npm-debug.log*
@@ -112,11 +108,28 @@ Thumbs.db
 *.tmp
 *.temp
 
-# Build outputs
-build/
+# Build outputs (uncomment build/ if you don't want to commit builds)
+# build/
 dist/
 out/
 
-# Package lock files (optional - you can include these if you want)
+# Deployment and documentation files (if any)
+*.deployment
+deployment/
+docs/build/
+
+# Security and sensitive files
+*.pem
+*.p12
+*.key
+*.crt
+config/production.json
+
+# Package lock files (keeping these for consistent installs)
+# Uncomment next lines if you want to ignore lock files
 # package-lock.json
 # yarn.lock
+
+# Production specific
+.vercel
+.netlify

@@ -44,7 +44,13 @@
     "build": "react-scripts build",
     "eject": "react-scripts eject",
     "server": "cd server && npm run dev",
-    "dev": "concurrently -n \"client,server\" -c \"bgBlue,bgYellow\" \"npm start\" \"npm run server\""
+    "dev": "concurrently -n \"client,server\" -c \"bgBlue,bgYellow\" \"npm start\" \"npm run server\"",
+    "build:client": "react-scripts build",
+    "build:server": "cd server && npm run build",
+    "build:full": "npm run build:client && npm run build:server",
+    "prod": "concurrently -n \"client,server\" -c \"bgBlue,bgYellow\" \"serve -s build -p 3000\" \"cd server && npm run prod\"",
+    "install:all": "npm install && cd server && npm install",
+    "clean": "rm -rf build && rm -rf node_modules && cd server && npm run clean"
   },
   "eslintConfig": {
     "extends": [
@@ -66,6 +72,7 @@
   },
   "devDependencies": {
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
+    "serve": "^14.2.5",
     "tailwindcss": "^3.2.7"
   }
 }

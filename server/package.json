@@ -1,15 +1,15 @@
 {
-  "name": "server",
+  "name": "study-notion-server",
   "version": "1.0.0",
-  "description": "",
+  "description": "Backend server for Study Notion EdTech platform",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": ["edtech", "education", "nodejs", "express", "mongodb"],
+  "author": "Som Gupta",
+  "license": "MIT",
   "dependencies": {
     "bcrypt": "^5.1.0",
     "bcryptjs": "^2.4.3",

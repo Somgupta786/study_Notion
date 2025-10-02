@@ -480,45 +480,60 @@ exports.markLectureAsComplete = async (req, res) => {
 	  })
 	}
 	try {
-	progressAlreadyExists = await CourseProgress.findOne({
-				  userID: userId,
-				  courseID: courseId,
-				})
-	  const completedVideos = progressAlreadyExists.completedVideos
-	  if (!completedVideos.includes(subSectionId)) {
-		await CourseProgress.findOneAndUpdate(
-		  {
+		// Find existing course progress
+		let progressAlreadyExists = await CourseProgress.findOne({
 			userID: userId,
 			courseID: courseId,
-		  },
-		  {
-			$push: { completedVideos: subSectionId },
-		  }
-		)
-	  }else{
-		return res.status(400).json({
-			success: false,
-			message: "Lecture already marked as complete",
-		  })
-	  }
-	  await CourseProgress.findOneAndUpdate(
-		{
-		  userId: userId,
-		  courseID: courseId,
-		},
-		{
-		  completedVideos: completedVideos,
-		}
-	  )
-	return res.status(200).json({
-	  success: true,
-	  message: "Lecture marked as complete",
-	})
-	} catch (error) {
-	  return res.status(500).json({
-		success: false,
-		message: error.message,
-	  })
-	}
+		});
 
+		// If no progress exists, create new progress record
+		if (!progressAlreadyExists) {
+			progressAlreadyExists = await CourseProgress.create({
+				userID: userId,
+				courseID: courseId,
+				completedVideos: [subSectionId]
+			});
+			
+			return res.status(200).json({
+				success: true,
+				message: "Lecture marked as complete (new progress created)",
+				data: progressAlreadyExists
+			});
+		}
+
+		// Check if lecture is already completed
+		if (progressAlreadyExists.completedVideos.includes(subSectionId)) {
+			return res.status(200).json({
+				success: true,
+				message: "Lecture already marked as complete",
+				data: progressAlreadyExists
+			});
+		}
+
+		// Add the subsection to completed videos
+		const updatedProgress = await CourseProgress.findOneAndUpdate(
+			{
+				userID: userId,
+				courseID: courseId,
+			},
+			{
+				$push: { completedVideos: subSectionId },
+			},
+			{ new: true }
+		);
+
+		return res.status(200).json({
+			success: true,
+			message: "Lecture marked as complete",
+			data: updatedProgress
+		});
+
+	} catch (error) {
+		console.error("Mark Lecture Complete Error:", error);
+		return res.status(500).json({
+			success: false,
+			message: "Internal server error while marking lecture as complete",
+			error: error.message,
+		});
+	}
 }

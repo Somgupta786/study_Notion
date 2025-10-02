@@ -93,28 +93,36 @@ exports.getAllUserDetails = async (req, res) => {
 
 exports.getEnrolledCourses=async (req,res) => {
 	try {
+        console.log("🎓 GetEnrolledCourses - User from token:", req.user);
         const id = req.user.id;
+        
         const user = await User.findById(id);
         if (!user) {
+            console.log("❌ User not found with ID:", id);
             return res.status(404).json({
                 success: false,
                 message: "User not found",
             });
         }
+        
+        console.log("✅ User found:", user.email, "- Enrolled courses count:", user.courses?.length);
+        
         const enrolledCourses = await User.findById(id).populate({
 			path : "courses",
-				populate : {
-					path: "courseContent",
+			populate : {
+				path: "courseContent",
 			}
-		}
-		).populate("courseProgress").exec();
-        // console.log(enrolledCourses);
+		}).populate("courseProgress").exec();
+		
+        console.log("📚 Populated enrolled courses:", enrolledCourses.courses?.length);
+        
         res.status(200).json({
             success: true,
             message: "User Data fetched successfully",
             data: enrolledCourses,
         });
     } catch (error) {
+        console.error("❌ GetEnrolledCourses Error:", error);
         return res.status(500).json({
             success: false,
             message: error.message,

@@ -454,8 +454,8 @@ const courseData = await fetch('/api/v1/course/createCourse', {
 
 ### 👨‍🎓 Student Account
 ```
-Email: aarav.agarwal@student.com
-Password: student123
+Email: som2212044@akgec.ac.in
+Password: Som@7866
 ```
 
 ### 👨‍🏫 Instructor Account  

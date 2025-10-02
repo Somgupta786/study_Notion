@@ -37,7 +37,7 @@ function Login() {
       <div>
         <button onClick={
           () => {
-            dispatch(login("aarav.agarwal@student.com", "student123", navigate)
+            dispatch(login("som2212044@akgec.ac.in", "Som@7866", navigate)
           )}
         } className="bg-yellow-100 font-semibold text-richblack-900 px-4 py-2 rounded-md flex">
           <TbCornerDownRightDouble className="text-2xl text-richblack-900 md:block hidden"/>

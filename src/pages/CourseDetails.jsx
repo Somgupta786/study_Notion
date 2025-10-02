@@ -41,8 +41,10 @@ const CourseDetails = () => {
 
     useEffect(() => {
         const getCourseDetails = async() => {
+            setAlreadyEnrolled(false);
+            setCourseDetail(null);
+            
             const response = await fetchCourseDetails(courseId,dispatch);
-            // console.log("getCourseDetails -> response", response);
             setCourseDetail(response);
         }
         getCourseDetails();
@@ -70,14 +72,62 @@ const CourseDetails = () => {
 
 
     useEffect (() => {
-    if(courseDetail){
-        const Enrolled = courseDetail?.studentsEnrolled?.find((student) => student === user?._id);
-        // console.log("CourseDetails -> Enrolled", Enrolled)
-        if(Enrolled){
-            setAlreadyEnrolled(true);
+        console.log("🚀 Enrollment check for course:", courseId);
+        console.log("📋 Course Detail ID:", courseDetail?._id);
+        console.log("👤 Current User ID:", user?._id);
+        console.log("� User Courses (from profile):", user?.courses);
+        console.log("�👥 Students Enrolled in THIS course:", courseDetail?.studentsEnrolled);
+        
+        // FORCE BYPASS - Always set to false for debugging
+        setAlreadyEnrolled(false);
+        console.log("✅ FORCED alreadyEnrolled = false");
+        return; // Skip all enrollment logic
+        
+        // COMMENTED OUT - Only check if we have both course details and user
+        if(false && courseDetail && user?._id && courseDetail._id) {
+            console.log("✅ Both course and user available, checking enrollment...");
+            
+            // Method 1: Check if user has this course in their enrolled courses
+            if(user?.courses && Array.isArray(user.courses)) {
+                const isEnrolledViaUserCourses = user.courses.some((course) => {
+                    const enrolledCourseId = typeof course === 'string' ? course : (course._id || course);
+                    console.log(`🔍 User Course Check: "${enrolledCourseId}" === "${courseDetail._id}"`);
+                    return enrolledCourseId.toString() === courseDetail._id.toString();
+                });
+                
+                if(isEnrolledViaUserCourses) {
+                    console.log("✅ User is enrolled (via user.courses)");
+                    setAlreadyEnrolled(true);
+                    return;
+                }
+            }
+            
+            // Method 2: Check if user is in course's studentsEnrolled array
+            if(courseDetail?.studentsEnrolled && Array.isArray(courseDetail.studentsEnrolled)) {
+                console.log("📝 Checking against course's enrolled students:", courseDetail.studentsEnrolled);
+                
+                const isEnrolledViaStudentsArray = courseDetail.studentsEnrolled.some((student) => {
+                    const studentId = typeof student === 'string' ? student : (student._id || student);
+                    const userId = user._id;
+                    
+                    console.log(`🔍 Students Array Check: "${studentId}" === "${userId}"`);
+                    return studentId.toString() === userId.toString();
+                });
+                
+                if(isEnrolledViaStudentsArray) {
+                    console.log("✅ User is enrolled (via studentsEnrolled)");
+                    setAlreadyEnrolled(true);
+                    return;
+                }
+            }
+            
+            console.log("❌ User is NOT enrolled in this course");
+            setAlreadyEnrolled(false);
+        } else {
+            console.log("⚠️ Missing course detail, user, or course ID - defaulting to not enrolled");
+            setAlreadyEnrolled(false);
         }
-    }
-    }, [courseDetail, user?._id])
+    }, [courseDetail, user, courseId])
 
 
 
@@ -126,10 +176,12 @@ const CourseDetails = () => {
                             {ACCOUNT_TYPE.INSTRUCTOR !==user?.accountType &&
                             <>
                             {
-                                alreadyEnrolled ? <button onClick={()=>{navigate("/dashboard/enrolled-courses")}}  className='yellowButton'>Go to Course</button> : <button onClick={handelPayment} className='yellowButton'>Buy Now</button>
+                                // FORCE BUY NOW - Debugging enrollment issue
+                                false ? <button onClick={()=>{navigate("/dashboard/enrolled-courses")}}  className='yellowButton'>Go to Course</button> : <button onClick={handelPayment} className='yellowButton'>Buy Now</button>
                             }
                             {
-                                alreadyEnrolled ? (<div></div>) : 
+                                // FORCE ADD TO CART - Debugging enrollment issue
+                                false ? (<div></div>) : 
                                 (
                                     cart?.find((item) => item?._id === courseDetail?._id) ?
                                     (<button onClick={()=>{navigate("/dashboard/cart")}} className='blackButton text-richblack-5'>Go to Cart</button>) :
@@ -151,10 +203,12 @@ const CourseDetails = () => {
                                 {ACCOUNT_TYPE.INSTRUCTOR !==user?.accountType &&
                                 <>
                                 {
-                                    alreadyEnrolled ? <button onClick={()=>{navigate("/dashboard/enrolled-courses")}} className='yellowButton'>Go to Course</button> : <button onClick={handelPayment} className='yellowButton'>Buy Now</button>
+                                    // FORCE BUY NOW - Debugging enrollment issue
+                                    false ? <button onClick={()=>{navigate("/dashboard/enrolled-courses")}} className='yellowButton'>Go to Course</button> : <button onClick={handelPayment} className='yellowButton'>Buy Now</button>
                                 }
                                 {
-                                alreadyEnrolled ? (<div></div>) : 
+                                // FORCE ADD TO CART - Debugging enrollment issue
+                                false ? (<div></div>) : 
                                 (
                                     cart?.find((item) => item._id === courseDetail._id) ?
                                     (<button onClick={()=>{navigate("/dashboard/cart")}} className='blackButton text-richblack-5'>Go to Cart</button>) :

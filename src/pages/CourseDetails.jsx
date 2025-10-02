@@ -34,6 +34,7 @@ const CourseDetails = () => {
             buyCourse(token,[courseId],user,navigate,dispatch);
         }
         else{
+            toast.error("Please login to continue");
             navigate('/login');
         }
     }

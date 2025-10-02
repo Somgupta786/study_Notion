@@ -10,9 +10,15 @@
     "prod": "NODE_ENV=production node index.js",
     "clean": "rm -rf node_modules package-lock.json",
     "install-prod": "npm ci --only=production",
-    "health-check": "node -e \"console.log('Server health check passed')\""  
+    "health-check": "node -e \"console.log('Server health check passed')\""
   },
-  "keywords": ["edtech", "education", "nodejs", "express", "mongodb"],
+  "keywords": [
+    "edtech",
+    "education",
+    "nodejs",
+    "express",
+    "mongodb"
+  ],
   "author": "Som Gupta",
   "license": "MIT",
   "dependencies": {

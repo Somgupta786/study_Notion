@@ -28,7 +28,7 @@ function loadScript (src) {
 
 
 export async function buyCourse (token, courses, userDetails, navigate, dispatch) {
-    // console.log("buyCourse -> courses",process.env.REACT_APP_BASE_URL)
+    
     const toastId = toast.loading("Please wait while we redirect you to payment gateway", {
       position: "bottom-center",
       autoClose: false,
@@ -37,20 +37,27 @@ export async function buyCourse (token, courses, userDetails, navigate, dispatch
     const res = await loadScript("https://checkout.razorpay.com/v1/checkout.js");
     if (!res) {
         toast.error("Razorpay SDK failed to load. Are you online?");
+        toast.dismiss(toastId);
         return;
         }
     const orderResponse = await apiConnector("POST", COURSE_PAYMENT_API, {courses},{
         Authorization: `Bearer ${token}`,
     })
     if(!orderResponse.data.success){
-        toast.error(orderResponse.data.message)
-        console.log("buyCourse -> orderResponse", orderResponse)
+        toast.error(orderResponse.data.message || "Payment initiation failed")
         toast.dismiss(toastId);
         return
     }
-    console.log("buyCourse -> orderResponse", orderResponse)
+    // Validate Razorpay key
+    const razorpayKey = process.env.REACT_APP_RAZORPAY_KEY_ID;
+    if (!razorpayKey) {
+        toast.error("Razorpay configuration missing. Please contact support.");
+        toast.dismiss(toastId);
+        return;
+    }
+    
     const options = {
-        key: process.env.REACT_APP_RAZORPAY_KEY_ID,
+        key: razorpayKey,
         currency: orderResponse.data.currency,
         amount: orderResponse.data.amount.toString(),
         order_id: orderResponse.data.orderId,
@@ -70,11 +77,21 @@ export async function buyCourse (token, courses, userDetails, navigate, dispatch
             color: "#686CFD",
         },
     };
+    // Check if Razorpay is available
+    if (!window.Razorpay) {
+        toast.error("Razorpay SDK not loaded properly. Please refresh and try again.");
+        toast.dismiss(toastId);
+        return;
+    }
+    
     const paymentObject = new window.Razorpay(options);
-    paymentObject.open();
+    
     paymentObject.on("payment.failed", function (response) {
-        toast.error("Payment Failed");
+        toast.error(`Payment Failed: ${response.error.description || response.error.reason}`);
+        toast.dismiss(toastId);
     });
+    
+    paymentObject.open();
     toast.dismiss(toastId);
 
     } catch (error) {

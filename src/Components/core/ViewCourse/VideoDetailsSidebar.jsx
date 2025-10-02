@@ -59,7 +59,7 @@ const VideoDetailsSidebar = ({setReviewModal}) => {
           <div className='flex flex-col'>
             <p>My Courses</p>
             <p className='text-sm font-semibold text-richblack-500'>
-              {completedLectures?.length} of {totalNoOfLectures} Lectures Completed
+              {completedLectures?.length || 0} of {totalNoOfLectures || 0} Lectures Completed
             </p>
           </div>
         </div>

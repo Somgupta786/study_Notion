@@ -1,5 +1,5 @@
 {
-  "name": "react-tailwind-css-starter-pack",
+  "name": "study-notion",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -33,11 +33,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/thepranaygupta/react-tailwind-css-starter-pack.git"
+    "url": "git+https://github.com/Somgupta786/study_Notion.git"
   },
-  "author": "Pranay Gupta",
+  "author": "Som Gupta",
   "bugs": {
-    "url": "https://github.com/thepranaygupta/react-tailwind-css-starter-pack/issues"
+    "url": "https://github.com/Somgupta786/study_Notion/issues"
   },
   "scripts": {
     "start": "react-scripts start",

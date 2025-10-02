@@ -5,13 +5,13 @@ import { useParams } from 'react-router-dom';
 import { useState } from 'react';
 import { useEffect } from 'react';
 import { ControlBar, Player } from 'video-react';
-// import '~video-react/dist/video-react.css'; // import css
+import 'video-react/dist/video-react.css'; // import css
 import { BigPlayButton, LoadingSpinner, PlaybackRateMenuButton, ForwardControl, ReplayControl, CurrentTimeDisplay, TimeDivider } from 'video-react';
 import {BiSkipPreviousCircle} from 'react-icons/bi';
 import {BiSkipNextCircle} from 'react-icons/bi';
 import {MdOutlineReplayCircleFilled} from 'react-icons/md';
 import { markLectureAsComplete } from '../../../services/operations/courseDetailsAPI';
-import { setCompletedLectures } from '../../../slices/viewCourseSlice';
+import { updateCompletedLectures } from '../../../slices/viewCourseSlice';
 import { useDispatch } from 'react-redux';
 
 
@@ -22,13 +22,12 @@ const VideoDetails = () => {
   const {token} = useSelector(state => state.auth);
   const {user}= useSelector(state => state.profile);
   // console.log("user",user._id);
-  const {courseSectionData, courseEntireData, completedLectures, totalNoOfLectures} = useSelector(state => state.viewCourse);
+  const {courseSectionData, completedLectures} = useSelector(state => state.viewCourse);
   const navigate = useNavigate();
   const playerRef = React.useRef(null);
 
   const [videoData, setVideoData] = useState([]);
   const [videoEnd, setVideoEnd] = useState(false);
-  const [loading, setLoading] = useState(false);
 
   useEffect (() => {
     if (courseSectionData.length === 0) {
@@ -103,13 +102,29 @@ const VideoDetails = () => {
 
 
   const handleLectureCompletion = async () => {
-    const res = await markLectureAsComplete({
+    console.log("Attempting to mark lecture complete:", {
+      userId: user._id,
+      courseId: courseId,
+      subSectionId: subsectionId,
+    });
+    
+    // Check if already completed to avoid duplicates
+    if (completedLectures.includes(subsectionId)) {
+      console.log("Lecture already marked as completed");
+      return;
+    }
+    
+    const result = await markLectureAsComplete({
       userId: user._id,
       courseId: courseId,
       subSectionId: subsectionId,
     }, token);
-    dispatch(setCompletedLectures([...completedLectures, videoData._id]));
-    console.log("lecture completed", completedLectures);
+    
+    if (result) {
+      // Use updateCompletedLectures instead of replacing the entire array
+      dispatch(updateCompletedLectures(subsectionId));
+      console.log("Lecture marked as completed successfully. Total completed:", completedLectures.length + 1);
+    }
   }
 
   //set video end to false when .play() is called

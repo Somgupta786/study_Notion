@@ -20,21 +20,23 @@ import RatingSlider from '../Components/core/Ratings/RatingSlider';
 
 function Home() {
     const [CatalogPageData, setCatalogPageData] = useState(null);
-    const categoryID = "6475dbeb49dcc886b5698441";
+    const categoryID = "68de181d211ed6d44c650df9"; // Web Development category
+
+    const dispatch = useDispatch();
 
     useEffect(() => {
         const fetchCatalogPageData = async () => {
-            
-                const result = await getCatalogaPageData(categoryID,dispatch);
+            try {
+                const result = await getCatalogaPageData(categoryID, dispatch);
                 setCatalogPageData(result);
-                // console.log("page data",CatalogPageData);
-            
+            } catch (error) {
+                console.error("Error fetching catalog data:", error);
+            }
         }
         if (categoryID) {
             fetchCatalogPageData();
         }
-    }, [categoryID])
-    const dispatch = useDispatch();
+    }, [categoryID, dispatch]);
   return (
     <div>
         <div className=' mx-auto relative flex flex-col w-11/12 items-center justify-between text-white '>

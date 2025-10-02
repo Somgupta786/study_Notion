@@ -20,12 +20,19 @@ const ViewCourse = () => {
             const courseData = await getFullDetailsOfCourse(courseId, token);
             dispatch(setCourseSectionData(courseData.courseDetails.courseContent));
             dispatch(setEntireCourseData( courseData.courseDetails));
-            dispatch(setCompletedLectures(courseData.completedVideos));
+            
+            // Handle completed videos properly - filter out "none" placeholder
+            const completedVideos = courseData.completedVideos && Array.isArray(courseData.completedVideos) 
+                ? courseData.completedVideos.filter(video => video !== "none")
+                : [];
+            dispatch(setCompletedLectures(completedVideos));
+            
             var lecture = 0;
             courseData?.courseDetails?.courseContent?.forEach((section) => {
                 lecture += section?.subSection?.length;
             });
             dispatch(setTotalNoOfLectures(lecture));
+            console.log("📚 Course loaded - Total lectures:", lecture, "Completed:", completedVideos.length);
         }
         setCourseSpecifics();
     }, [courseId, token, dispatch]);

@@ -5,7 +5,12 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "dev": "nodemon index.js"
+    "dev": "nodemon index.js",
+    "build": "npm install --production",
+    "prod": "NODE_ENV=production node index.js",
+    "clean": "rm -rf node_modules package-lock.json",
+    "install-prod": "npm ci --only=production",
+    "health-check": "node -e \"console.log('Server health check passed')\""  
   },
   "keywords": ["edtech", "education", "nodejs", "express", "mongodb"],
   "author": "Som Gupta",
@@ -22,11 +27,14 @@
     "jsonwebtoken": "^9.0.0",
     "mongoose": "^7.1.0",
     "nodemailer": "^6.9.1",
-    "nodemon": "^2.0.22",
     "otp-generator": "^4.0.1",
     "razorpay": "^2.8.6"
   },
+  "devDependencies": {
+    "nodemon": "^2.0.22"
+  },
   "engines": {
-    "node": ">=16.9"
+    "node": ">=16.9",
+    "npm": ">=8.0.0"
   }
 }

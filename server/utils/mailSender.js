@@ -7,7 +7,7 @@ let transporter;
 // Initialize transporter once
 function createTransporter() {
     if (!transporter) {
-        transporter = nodemailer.createTransporter({
+        transporter = nodemailer.createTransport({
             host: process.env.MAIL_HOST,
             port: 587,
             secure: false, // TLS
